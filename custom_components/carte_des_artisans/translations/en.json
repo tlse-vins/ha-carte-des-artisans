@@ -1,0 +1,163 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Follow a trade",
+        "description": "Find the craftsmen of a trade around your home or another place, using the public data of the Carte des artisans (cartedesartisans.fr, an independent site, not affiliated with Insee nor with the chambers of trades). Your location never leaves Home Assistant.",
+        "data": {
+          "rubrique": "Trade",
+          "rayon": "Radius",
+          "labellises": "Certified businesses only",
+          "suivre_maison": "Search around my home"
+        },
+        "data_description": {
+          "rubrique": "One of the trades of the Carte des artisans.",
+          "rayon": "Distance as the crow flies around the search point.",
+          "labellises": "Only businesses holding the RGE, Living Heritage Company (EPV) or Master craftsman label.",
+          "suivre_maison": "Follows the home location set in Home Assistant. Untick it to choose another place on a map."
+        }
+      },
+      "position": {
+        "title": "Search location",
+        "description": "Choose the point around which craftsmen are searched.",
+        "data": {
+          "position": "Location"
+        }
+      }
+    },
+    "error": {
+      "maison_sans_position": "The location of your home is not set: set it in Settings › System › General, or untick “Search around my home”.",
+      "rubrique_inconnue": "This trade does not exist on the Carte des artisans."
+    },
+    "abort": {
+      "already_configured": "This trade is already followed at this location.",
+      "cannot_connect": "The Carte des artisans site cannot be reached. Try again later."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Search settings",
+        "data": {
+          "rayon": "Radius",
+          "labellises": "Certified businesses only",
+          "suivre_maison": "Search around my home"
+        },
+        "data_description": {
+          "rayon": "Distance as the crow flies around the search point.",
+          "labellises": "Only businesses holding the RGE, Living Heritage Company (EPV) or Master craftsman label.",
+          "suivre_maison": "Follows the home location set in Home Assistant. Untick it to choose another place on a map."
+        }
+      },
+      "position": {
+        "title": "Search location",
+        "description": "Choose the point around which craftsmen are searched.",
+        "data": {
+          "position": "Location"
+        }
+      }
+    },
+    "error": {
+      "maison_sans_position": "The location of your home is not set: set it in Settings › System › General, or untick “Search around my home”."
+    },
+    "abort": {
+      "already_configured": "This trade is already followed at this location."
+    }
+  },
+  "selector": {
+    "rayon": {
+      "options": {
+        "5": "5 km",
+        "10": "10 km",
+        "25": "25 km",
+        "50": "50 km"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "nombre": {
+        "name": "Craftsmen in the radius",
+        "unit_of_measurement": "craftsmen",
+        "state_attributes": {
+          "rubrique": { "name": "Trade" },
+          "rayon_km": { "name": "Radius (km)" },
+          "labellises_seulement": { "name": "Certified only" },
+          "lien_carte": { "name": "Map link" },
+          "donnees_du": { "name": "Data from" }
+        }
+      },
+      "plus_proche": {
+        "name": "First craftsman",
+        "state_attributes": {
+          "nom": { "name": "Name" },
+          "enseigne": { "name": "Trade name" },
+          "activite": { "name": "Activity" },
+          "adresse": { "name": "Address" },
+          "commune": { "name": "Town" },
+          "distance_km": { "name": "Distance (km)" },
+          "distance": { "name": "Distance" },
+          "labels": { "name": "Labels" },
+          "telephone": { "name": "Phone" },
+          "site": { "name": "Website" },
+          "position_approximative": { "name": "Approximate location" },
+          "lien": { "name": "Listing link" },
+          "itineraire": { "name": "Directions" },
+          "artisans": { "name": "Craftsmen" }
+        }
+      }
+    }
+  },
+  "services": {
+    "chercher_artisan": {
+      "name": "Find a craftsman",
+      "description": "Finds craftsmen of a trade (plumber, electrician, locksmith, baker…) around the home, or around given coordinates, using the Carte des artisans (France). Certified businesses (RGE, EPV, Master craftsman) come first, then the closest. Returns the number found and the first ones with their phone number when known, address, distance and links.",
+      "fields": {
+        "metier": {
+          "name": "Trade",
+          "description": "Trade to search, in French as named on the site (for example “Plombier”, “Électricien”, “Serrurier”), or its key such as “maison-depannage.plombier”. Case and accents are ignored."
+        },
+        "rayon": {
+          "name": "Radius",
+          "description": "Search radius in km: 5, 10, 25 or 50 (default 10)."
+        },
+        "labellises": {
+          "name": "Certified only",
+          "description": "Only businesses holding the RGE, EPV or Master craftsman label."
+        },
+        "latitude": {
+          "name": "Latitude",
+          "description": "Latitude of the search point (together with longitude). Default: the home."
+        },
+        "longitude": {
+          "name": "Longitude",
+          "description": "Longitude of the search point (together with latitude). Default: the home."
+        },
+        "nombre": {
+          "name": "Number of results",
+          "description": "Maximum number of craftsmen returned (1 to 50, default 5)."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "metier_inconnu": {
+      "message": "Unknown trade: {metier}. Use a trade name of the Carte des artisans, for example “Plombier”."
+    },
+    "position_inconnue": {
+      "message": "No search location: set the home location in Settings › System › General, or give a latitude and a longitude."
+    },
+    "donnees_indisponibles": {
+      "message": "The Carte des artisans data cannot be read: {erreur}"
+    },
+    "rubrique_inconnue": {
+      "message": "The trade {rubrique} no longer exists on the Carte des artisans."
+    }
+  },
+  "issues": {
+    "rubrique_inconnue": {
+      "title": "Trade removed from the Carte des artisans",
+      "description": "The trade followed by “{entree}” ({rubrique}) no longer exists on the Carte des artisans. Delete this entry and add the trade again under its new name."
+    }
+  }
+}

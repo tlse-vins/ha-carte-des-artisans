@@ -1,0 +1,163 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Suivre un métier",
+        "description": "Trouvez les artisans d'un métier autour de votre maison ou d'un autre lieu, grâce aux données publiques de la Carte des artisans (cartedesartisans.fr, site indépendant, non affilié à l'Insee ni aux chambres de métiers et de l'artisanat). Votre position ne quitte jamais Home Assistant.",
+        "data": {
+          "rubrique": "Métier",
+          "rayon": "Rayon",
+          "labellises": "Seulement les entreprises labellisées",
+          "suivre_maison": "Chercher autour de ma maison"
+        },
+        "data_description": {
+          "rubrique": "L'un des métiers de la Carte des artisans.",
+          "rayon": "Distance à vol d'oiseau autour du point de recherche.",
+          "labellises": "Seulement les entreprises RGE, Entreprises du patrimoine vivant (EPV) ou Maîtres artisans.",
+          "suivre_maison": "Suit la position de la maison réglée dans Home Assistant. Décochez pour choisir un autre lieu sur une carte."
+        }
+      },
+      "position": {
+        "title": "Lieu de recherche",
+        "description": "Choisissez le point autour duquel chercher les artisans.",
+        "data": {
+          "position": "Lieu"
+        }
+      }
+    },
+    "error": {
+      "maison_sans_position": "La position de votre maison n'est pas renseignée : réglez-la dans Paramètres › Système › Général, ou décochez « Chercher autour de ma maison ».",
+      "rubrique_inconnue": "Ce métier n'existe pas sur la Carte des artisans."
+    },
+    "abort": {
+      "already_configured": "Ce métier est déjà suivi à ce lieu.",
+      "cannot_connect": "Le site de la Carte des artisans est injoignable. Réessayez plus tard."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Réglages de la recherche",
+        "data": {
+          "rayon": "Rayon",
+          "labellises": "Seulement les entreprises labellisées",
+          "suivre_maison": "Chercher autour de ma maison"
+        },
+        "data_description": {
+          "rayon": "Distance à vol d'oiseau autour du point de recherche.",
+          "labellises": "Seulement les entreprises RGE, Entreprises du patrimoine vivant (EPV) ou Maîtres artisans.",
+          "suivre_maison": "Suit la position de la maison réglée dans Home Assistant. Décochez pour choisir un autre lieu sur une carte."
+        }
+      },
+      "position": {
+        "title": "Lieu de recherche",
+        "description": "Choisissez le point autour duquel chercher les artisans.",
+        "data": {
+          "position": "Lieu"
+        }
+      }
+    },
+    "error": {
+      "maison_sans_position": "La position de votre maison n'est pas renseignée : réglez-la dans Paramètres › Système › Général, ou décochez « Chercher autour de ma maison »."
+    },
+    "abort": {
+      "already_configured": "Ce métier est déjà suivi à ce lieu."
+    }
+  },
+  "selector": {
+    "rayon": {
+      "options": {
+        "5": "5 km",
+        "10": "10 km",
+        "25": "25 km",
+        "50": "50 km"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "nombre": {
+        "name": "Artisans dans le rayon",
+        "unit_of_measurement": "artisans",
+        "state_attributes": {
+          "rubrique": { "name": "Métier" },
+          "rayon_km": { "name": "Rayon (km)" },
+          "labellises_seulement": { "name": "Labellisés seulement" },
+          "lien_carte": { "name": "Lien vers la carte" },
+          "donnees_du": { "name": "Données du" }
+        }
+      },
+      "plus_proche": {
+        "name": "Premier artisan",
+        "state_attributes": {
+          "nom": { "name": "Nom" },
+          "enseigne": { "name": "Enseigne" },
+          "activite": { "name": "Activité" },
+          "adresse": { "name": "Adresse" },
+          "commune": { "name": "Commune" },
+          "distance_km": { "name": "Distance (km)" },
+          "distance": { "name": "Distance" },
+          "labels": { "name": "Labels" },
+          "telephone": { "name": "Téléphone" },
+          "site": { "name": "Site" },
+          "position_approximative": { "name": "Position approximative" },
+          "lien": { "name": "Lien vers la fiche" },
+          "itineraire": { "name": "Itinéraire" },
+          "artisans": { "name": "Artisans" }
+        }
+      }
+    }
+  },
+  "services": {
+    "chercher_artisan": {
+      "name": "Chercher un artisan",
+      "description": "Cherche des artisans d'un métier (plombier, électricien, serrurier, boulanger…) autour de la maison, ou de coordonnées données, avec la Carte des artisans (France). Les entreprises labellisées (RGE, EPV, Maître artisan) d'abord, puis les plus proches. Renvoie le nombre trouvé et les premiers artisans avec leur téléphone s'il est connu, leur adresse, leur distance et des liens.",
+      "fields": {
+        "metier": {
+          "name": "Métier",
+          "description": "Métier cherché, tel qu'il est nommé sur le site (par exemple « Plombier », « Électricien », « Serrurier ») ou sa clé, comme « maison-depannage.plombier ». Majuscules et accents sont ignorés."
+        },
+        "rayon": {
+          "name": "Rayon",
+          "description": "Rayon de recherche en km : 5, 10, 25 ou 50 (10 par défaut)."
+        },
+        "labellises": {
+          "name": "Labellisés seulement",
+          "description": "Seulement les entreprises RGE, EPV ou Maîtres artisans."
+        },
+        "latitude": {
+          "name": "Latitude",
+          "description": "Latitude du point de recherche (avec la longitude). Par défaut : la maison."
+        },
+        "longitude": {
+          "name": "Longitude",
+          "description": "Longitude du point de recherche (avec la latitude). Par défaut : la maison."
+        },
+        "nombre": {
+          "name": "Nombre de résultats",
+          "description": "Nombre maximal d'artisans renvoyés (1 à 50, 5 par défaut)."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "metier_inconnu": {
+      "message": "Métier inconnu : {metier}. Indiquez un métier de la Carte des artisans, par exemple « Plombier »."
+    },
+    "position_inconnue": {
+      "message": "Aucun lieu de recherche : renseignez la position de la maison dans Paramètres › Système › Général, ou indiquez une latitude et une longitude."
+    },
+    "donnees_indisponibles": {
+      "message": "Les données de la Carte des artisans sont illisibles : {erreur}"
+    },
+    "rubrique_inconnue": {
+      "message": "Le métier {rubrique} n'existe plus sur la Carte des artisans."
+    }
+  },
+  "issues": {
+    "rubrique_inconnue": {
+      "title": "Métier retiré de la Carte des artisans",
+      "description": "Le métier suivi par « {entree} » ({rubrique}) n'existe plus sur la Carte des artisans. Supprimez cette entrée et ajoutez de nouveau le métier sous son nouveau nom."
+    }
+  }
+}

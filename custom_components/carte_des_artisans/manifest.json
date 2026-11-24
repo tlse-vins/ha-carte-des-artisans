@@ -1,0 +1,12 @@
+{
+  "domain": "carte_des_artisans",
+  "name": "Carte des artisans",
+  "codeowners": ["@tlse-vins"],
+  "config_flow": true,
+  "documentation": "https://github.com/tlse-vins/ha-carte-des-artisans",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/tlse-vins/ha-carte-des-artisans/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

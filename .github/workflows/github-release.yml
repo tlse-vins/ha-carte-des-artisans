@@ -1,0 +1,77 @@
+# -----------------------------------------------------------------------------
+# Publish the GitHub Release of every `vX.Y.Z` tag that has none yet.
+#
+# The Marketplace (HACS) offers the latest releases as installable versions,
+# and the catalog requires at least one full release.
+#
+# Triggers:
+#   - called by the Release workflow, right after it pushed the new tag;
+#   - a `vX.Y.Z` tag pushed by hand;
+#   - a manual run (workflow_dispatch), to back-fill missing Releases.
+# Idempotent: it only creates the missing Releases, oldest first.
+#
+# The notes are the version's section of CHANGELOG.md, read from the tag
+# itself; when there is none, GitHub generates them.
+# -----------------------------------------------------------------------------
+name: GitHub releases
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  releases:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the Releases
+    concurrency:
+      group: github-releases
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # every tag, to read its CHANGELOG.md
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Create the missing Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          existing="$(gh release list --limit 1000 --json tagName --jq '.[].tagName')"
+          tags="$(git tag --list --sort=v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)"
+          latest="$(tail -n1 <<<"$tags")"
+
+          for tag in $tags; do
+            if grep -qxF "$tag" <<<"$existing"; then
+              continue
+            fi
+
+            notes="${RUNNER_TEMP}/notes-${tag}.md"
+            : >"$notes"
+            if git cat-file -e "${tag}:CHANGELOG.md" 2>/dev/null; then
+              git show "${tag}:CHANGELOG.md" |
+                python .github/scripts/release.py notes "${tag#v}" >"$notes"
+            fi
+
+            # Back-filling oldest first must not mark an old version as latest.
+            is_latest=false
+            if [ "$tag" = "$latest" ]; then is_latest=true; fi
+
+            if [ -s "$notes" ]; then
+              gh release create "$tag" --verify-tag --title "$tag" --notes-file "$notes" --latest="$is_latest"
+            else
+              gh release create "$tag" --verify-tag --title "$tag" --generate-notes --latest="$is_latest"
+            fi
+            echo "Created the release $tag"
+          done

@@ -1,0 +1,17 @@
+{
+  "entity": {
+    "sensor": {
+      "nombre": {
+        "default": "mdi:account-hard-hat"
+      },
+      "plus_proche": {
+        "default": "mdi:map-marker-account"
+      }
+    }
+  },
+  "services": {
+    "chercher_artisan": {
+      "service": "mdi:hammer-wrench"
+    }
+  }
+}

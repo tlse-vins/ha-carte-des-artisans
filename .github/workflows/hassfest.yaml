@@ -1,0 +1,23 @@
+# Contrôle de l'intégration par hassfest (manifest, services, traductions...),
+# exigé pour l'inscription au catalogue.
+name: Hassfest
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hassfest:
+    name: Hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Hassfest
+        uses: home-assistant/actions/hassfest@master

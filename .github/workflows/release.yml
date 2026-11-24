@@ -1,0 +1,88 @@
+# -----------------------------------------------------------------------------
+# Publish a new version, entirely from the GitHub UI.
+#
+# In GitHub: Actions -> Release -> "Run workflow" -> patch / minor / major.
+#
+# In one run:
+#   1. computes the next semver from the `version` of
+#      custom_components/carte_des_artisans/manifest.json and writes it there;
+#   2. moves the `## [Unreleased]` section of CHANGELOG.md under the version;
+#   3. commits the bump and pushes the `vX.Y.Z` tag;
+#   4. calls github-release.yml to publish the GitHub Release of the tag (the
+#      catalog and the Marketplace need a full release, not just a tag).
+#
+# A tag pushed with the default GITHUB_TOKEN does NOT trigger other workflows,
+# hence the direct call to github-release.yml. No personal token needed.
+# -----------------------------------------------------------------------------
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Version bump for this release"
+        required: true
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the version bump and push the tag
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Check the release script
+        run: python .github/scripts/test_release.py
+
+      - name: Bump the manifest version and roll the changelog
+        id: bump
+        env:
+          RELEASE_TYPE: ${{ inputs.release-type }}
+        run: |
+          set -euo pipefail
+          version="$(python .github/scripts/release.py prepare "$RELEASE_TYPE" \
+            "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}")"
+          if git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
+            echo "::error::The tag v${version} already exists"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      # If the branch is protected against direct pushes, allow GitHub Actions
+      # to bypass the rule, or release from an unprotected branch.
+      - name: Commit, tag and push
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add custom_components/carte_des_artisans/manifest.json CHANGELOG.md
+          git commit -m "chore(release): ${VERSION}"
+          git tag -a "v${VERSION}" -m "Release ${VERSION}"
+
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "v${VERSION}"
+
+  github-release:
+    needs: prepare
+    uses: ./.github/workflows/github-release.yml
+    permissions:
+      contents: write

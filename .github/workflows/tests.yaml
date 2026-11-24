@@ -1,0 +1,35 @@
+# Tests de l'intégration (pytest-homeassistant-custom-component) et du script
+# de publication. Aucun accès réseau : les tests utilisent un faux site.
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: Pytest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements_test.txt
+
+      - name: Release script tests
+        run: python .github/scripts/test_release.py
+
+      - name: Integration tests
+        run: pytest

@@ -1,0 +1,44 @@
+chercher_artisan:
+  fields:
+    metier:
+      required: true
+      example: "Plombier"
+      selector:
+        text:
+    rayon:
+      default: "10"
+      selector:
+        select:
+          options:
+            - "5"
+            - "10"
+            - "25"
+            - "50"
+          translation_key: rayon
+    labellises:
+      default: false
+      selector:
+        boolean:
+    latitude:
+      example: 43.6045
+      selector:
+        number:
+          min: -90
+          max: 90
+          step: any
+          mode: box
+    longitude:
+      example: 1.444
+      selector:
+        number:
+          min: -180
+          max: 180
+          step: any
+          mode: box
+    nombre:
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
