@@ -10,6 +10,8 @@ Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-24
+
 ### Added
 
 - Configuration par l'interface : métier (rubrique du site), rayon de 5, 10,
@@ -25,3 +27,6 @@ Release.
 - Données publiques de cartedesartisans.fr téléchargées seulement pour les
   départements à portée du rayon ; la position n'est jamais envoyée.
 - Traductions française et anglaise ; logo de l'intégration (`brand/`).
+
+[Unreleased]: https://github.com/tlse-vins/ha-carte-des-artisans/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/tlse-vins/ha-carte-des-artisans/releases/tag/v1.0.0
